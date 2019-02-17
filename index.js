@@ -157,7 +157,7 @@ module.exports = (nextApp, {
         rolling: sessionRolling,
         saveUninitialized: sessionSaveUninitialized,
         cookie: {
-            name: sessionCookie
+            name: sessionCookie,
             httpOnly: true,
             secure: 'auto',
             maxAge: sessionMaxAge
