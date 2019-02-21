@@ -16,9 +16,9 @@ module.exports = ({
       email,
       emailToken,
       provider
-    } = {}) => {},
-    update: (user, profile) => {},
-    insert: (user, profile) => {},
+    } = {}, req) => {},
+    update: (user, profile, params={}, req) => {},
+    insert: (user, profile, params={}, req) => {},
     serialize: (user) => {},
     deserialize: (id) => {}
   }
@@ -104,7 +104,7 @@ module.exports = ({
           };
 
           // Update details for the new provider for this user.
-          return functions.update(nextUser, _profile, _params)
+          return functions.update(nextUser, _profile, _params, req)
         }
 
         // Save the Access Token to the current session.
@@ -128,17 +128,17 @@ module.exports = ({
             name: providerName.toLowerCase(),
             id: profile.id
           }
-        })
+        }, req)
         .then(user => {
           if (req.user) {
             // This section handles scenarios when a user is already signed in.
-            
+
             if (user) {
-              // This section handles if the user is already logged in              
+              // This section handles if the user is already logged in
               if (req.user.id === user.id) {
-                // This section handles if the user is already logged in and is 
+                // This section handles if the user is already logged in and is
                 // already linked to local account they are signed in with.
-                // If they are, all we need to do is update the Refresh Token 
+                // If they are, all we need to do is update the Refresh Token
                 // value if we got one.
                 if (refreshToken) {
                   user[providerName.toLowerCase()] = {
@@ -147,7 +147,7 @@ module.exports = ({
                     refreshToken: refreshToken
                   }
 
-                  functions.update(user, _profile, _params)
+                  functions.update(user, _profile, _params, req)
                   .then(user => {
                     return next(null, user)
                   })
@@ -158,11 +158,11 @@ module.exports = ({
                   return next(null, user)
                 }
               } else {
-                // This section handles if a user is logged in but the oAuth 
-                // account they are trying to link to is already linked to a 
+                // This section handles if a user is logged in but the oAuth
+                // account they are trying to link to is already linked to a
                 // different local account.
-                
-                // This prevents users from linking an oAuth account to more 
+
+                // This prevents users from linking an oAuth account to more
                 // than one local account at the same time.
                 return next(null, false)
               }
@@ -177,7 +177,7 @@ module.exports = ({
               return functions.serialize(req.user)
               .then(id => {
                 if (!id) throw new Error("Unable to serialize user")
-                return functions.find({ id: id })
+                return functions.find({ id: id }, req)
               })
               .then(user => {
                 // This error should not happen, unless the currently signed in
@@ -199,12 +199,12 @@ module.exports = ({
               // This section handles senarios where the user is not logged in
               // but they seem to have an account already, so we sign them in
               // as that user.
-              
+
               // Update Access and Refresh Tokens for the user if we got them.
               if (accessToken || refreshToken) {
                 if (accessToken) user[providerName.toLowerCase()].accessToken = accessToken
                 if (refreshToken) user[providerName.toLowerCase()].refreshToken = refreshToken
-                return functions.update(user, _profile, _params)
+                return functions.update(user, _profile, _params, req)
                 .then(user => {
                   return next(null, user)
                 })
@@ -218,14 +218,14 @@ module.exports = ({
               // This section handles senarios where the user is not logged in
               // and they don't have a local account already.
 
-              // First we check to see if a local account with the same email 
+              // First we check to see if a local account with the same email
               // address as the one associated with their oAuth profile exists.
               //
-              // This is so they can't accidentally end up with two accounts 
+              // This is so they can't accidentally end up with two accounts
               // linked to the same email address.
-              return functions.find({email: profile.email})
+              return functions.find({email: profile.email}, req)
               .then(user => {
-                
+
                 if (user) {
                   // We already have a local account associated with their
                   // email address.
@@ -255,7 +255,7 @@ module.exports = ({
                   // address then trying to sign in from it, so don't do that.
                   return next(null, false)
                 }
-                
+
                 // If an account does not exist, create one for them and return
                 // a user object to passport, which will sign them in.
                 return functions.insert({
@@ -266,7 +266,7 @@ module.exports = ({
                     accessToken: accessToken,
                     refreshToken: refreshToken
                   }
-                }, _profile, _params)
+                }, _profile, _params, req)
                 .then(user => {
                   return next(null, user)
                 })
@@ -298,7 +298,7 @@ module.exports = ({
   }) => {
     // Route to start sign in
     expressApp.get(`${pathPrefix}/oauth/${providerName.toLowerCase()}`, passport.authenticate(providerName, providerOptions))
-    
+
     // Route to call back to after signing in
     expressApp.get(`${pathPrefix}/oauth/${providerName.toLowerCase()}/callback`,
       passport.authenticate(providerName, {
@@ -306,7 +306,7 @@ module.exports = ({
         failureRedirect: `${pathPrefix}/error?action=signin&type=oauth&service=${providerName}`
       })
     )
-  
+
     // Route to post to unlink accounts
     expressApp.post(`${pathPrefix}/oauth/${providerName.toLowerCase()}/unlink`, (req, res, next) => {
       if (!req.user) {
@@ -315,7 +315,7 @@ module.exports = ({
 
       // First get the User ID from the User, then look up the user details.
       // Note: We don't use the User object in req.user directly as it is a
-      // a simplified set of properties set by functions.deserialize().    
+      // a simplified set of properties set by functions.deserialize().
       functions.serialize(req.user)
       .then(id => {
         if (!id) throw new Error("Unable to serialize user")

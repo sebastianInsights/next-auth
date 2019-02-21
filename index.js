@@ -90,16 +90,16 @@ module.exports = (nextApp, {
                    email,
                    emailToken,
                    provider // provider = { name: 'twitter', id: '123456' }
-               } = {}) => {
+               } = {}, req) => {
             Promise.resolve(user)
         },
-        update: (user, profile) => {
+        update: (user, profile, params={}, req) => {
             Promise.resolve(user)
         },
-        insert: (user, profile) => {
+        insert: (user, profile, params={}, req) => {
             Promise.resolve(user)
         },
-        remove: (id) => {
+        remove: (id, req) => {
             Promise.resolve(id)
         },
         serialize: (user) => {
@@ -379,7 +379,7 @@ module.exports = (nextApp, {
                         return functions.insert({
                             email: email,
                             emailToken: token
-                        }, null, req)
+                        }, null, null, req)
                     }
                 })
                 .then(user => {
