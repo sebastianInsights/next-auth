@@ -73,6 +73,9 @@ module.exports = (nextApp, {
     // if not specified, which may cause problems if your site uses multiple
     // aliases (e.g. 'example.com and 'www.examples.com').
     serverUrl = null,
+    signinUrl = null,
+    callbackUrl = null,
+
     // If we are behind a proxy server and it says we are running SSL, trust it.
     // All this does is make sure we use HTTPS for callback URLs and email links.
     // You should never need to turn this off.
@@ -292,8 +295,8 @@ module.exports = (nextApp, {
                 let configuredProviders = {}
                 const configPromises = providers.map(provider => {
                     configuredProviders[provider.providerName] = {
-                        signin: (serverUrl || '') + `${pathPrefix}/oauth/${provider.providerName.toLowerCase()}`,
-                        callback: (serverUrl || '') + `${pathPrefix}/oauth/${provider.providerName.toLowerCase()}/callback`
+                        signin: (serverUrl || signinUrl || '') + `${pathPrefix}/oauth/${provider.providerName.toLowerCase()}`,
+                        callback: (serverUrl || callbackUrl || '') + `${pathPrefix}/oauth/${provider.providerName.toLowerCase()}/callback`
                     }
 
                     return Promise.resolve(provider.onConfig && provider.onConfig(req));
@@ -312,8 +315,8 @@ module.exports = (nextApp, {
             let configuredProviders = {}
             const configPromises = providers.map(provider => {
                 configuredProviders[provider.providerName] = {
-                    signin: (serverUrl || '') + `${pathPrefix}/oauth/${provider.providerName.toLowerCase()}`,
-                    callback: (serverUrl || '') + `${pathPrefix}/oauth/${provider.providerName.toLowerCase()}/callback`
+                    signin: (serverUrl || signinUrl || '') + `${pathPrefix}/oauth/${provider.providerName.toLowerCase()}`,
+                    callback: (serverUrl || callbackUrl || '') + `${pathPrefix}/oauth/${provider.providerName.toLowerCase()}/callback`
                 }
 
                 return Promise.resolve(provider.onConfig && provider.onConfig(req));
