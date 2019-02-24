@@ -301,13 +301,12 @@ module.exports = ({
     expressApp.get(`${pathPrefix}/oauth/${providerName.toLowerCase()}`, passport.authenticate(providerName, providerOptions))
 
     // Route to call back to after signing in
-    expressApp.get(`${pathPrefix}/oauth/${providerName.toLowerCase()}/callback`, (req, res, next) => {
-      debugger;
+    expressApp.get(`${pathPrefix}/oauth/${providerName.toLowerCase()}/callback`,
       passport.authenticate(providerName, {
         successRedirect: `${pathPrefix}/callback?action=signin&service=${providerName}`,
         failureRedirect: `${pathPrefix}/error?action=signin&type=oauth&service=${providerName}`
-      })(req, res, next);
-    })
+      })
+    )
 
     // Route to post to unlink accounts
     expressApp.post(`${pathPrefix}/oauth/${providerName.toLowerCase()}/unlink`, (req, res, next) => {
