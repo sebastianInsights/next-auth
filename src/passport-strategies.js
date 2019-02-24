@@ -10,6 +10,7 @@ module.exports = ({
   pathPrefix = '/auth', // URL base path for authentication routes
   providers = [],
   serverUrl = null,
+  callbackUrl = null,
   functions = {
     find: ({
       id,
@@ -66,7 +67,7 @@ module.exports = ({
     getProfile
   }) => {
 
-    strategyOptions.callbackURL = (strategyOptions.callbackURL || (serverUrl || '') + `${pathPrefix}/oauth/${providerName.toLowerCase()}/callback`)
+    strategyOptions.callbackURL = (strategyOptions.callbackURL || (serverUrl || callbackUrl || '') + `${pathPrefix}/oauth/${providerName.toLowerCase()}/callback`)
     strategyOptions.passReqToCallback = true
 
     passport.use(providerName, new Strategy(strategyOptions, (req, accessToken, refreshToken, _params, _profile, next) => {

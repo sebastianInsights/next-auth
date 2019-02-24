@@ -186,6 +186,7 @@ module.exports = (nextApp, {
     passportStrategies({
         expressApp: expressApp,
         serverUrl: serverUrl,
+        callbackUrl: callbackUrl,
         providers: providers,
         functions: functions
     })
