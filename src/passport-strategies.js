@@ -301,10 +301,11 @@ module.exports = ({
     expressApp.get(
         `${pathPrefix}/oauth/${providerName.toLowerCase()}`,
         (req, res, next) => {
-          debugger;
           passport.authenticate(providerName, {
             ...providerOptions,
-            state: Buffer.from(JSON.stringify({ returnTo: `https://${req.headers.host}` })).toString('base64'),
+            state: Buffer.from(
+                JSON.stringify({ returnTo: req.headers.host }),
+            ).toString("base64"),
           })(req, res, next);
         },
     );
@@ -313,7 +314,19 @@ module.exports = ({
     expressApp.get(
         `${pathPrefix}/oauth/${providerName.toLowerCase()}/callback`,
         (req, res, next) => {
-          debugger;
+          if (req.query.state) {
+            try {
+              const parsedState = JSON.parse(
+                  Buffer.from(req.query.state, "base64").toString(),
+              );
+              if(parsedState.returnTo && parsedState.returnTo !== req.headers.host){
+                res.redirect(`https://${parsedState.returnTo}${req.originalUrl}`);
+                return;
+              }
+            } catch (b64err) {
+              debugger;
+            }
+          }
           passport.authenticate(providerName, {
             successRedirect: `${pathPrefix}/callback?action=signin&service=${providerName}`,
             failureRedirect: `${pathPrefix}/error?action=signin&type=oauth&service=${providerName}`,
