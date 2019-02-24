@@ -305,13 +305,16 @@ module.exports = (nextApp, {
     expressApp.get(`${pathPrefix}/providers`, (req, res) => {
         return new Promise((resolve, reject) => {
             let configuredProviders = {}
-            providers.forEach(provider => {
+            const configPromises = providers.map(provider => {
                 configuredProviders[provider.providerName] = {
                     signin: (serverUrl || '') + `${pathPrefix}/oauth/${provider.providerName.toLowerCase()}`,
                     callback: (serverUrl || '') + `${pathPrefix}/oauth/${provider.providerName.toLowerCase()}/callback`
                 }
-            })
-            return res.json(configuredProviders)
+
+                return Promise.resolve(provider.onConfig && provider.onConfig(req));
+            });
+
+            return Promise.all(configPromises).then(res.json(configuredProviders));
         })
     })
 
