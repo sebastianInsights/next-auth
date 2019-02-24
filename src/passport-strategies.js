@@ -305,7 +305,7 @@ module.exports = ({
       passport.authenticate(providerName, {
         successRedirect: `${pathPrefix}/callback?action=signin&service=${providerName}`,
         failureRedirect: `${pathPrefix}/error?action=signin&type=oauth&service=${providerName}`
-      }, (req, res) => {
+      }, (err, user, info) => {
         debugger;
       })
     )
