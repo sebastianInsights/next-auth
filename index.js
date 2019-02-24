@@ -290,13 +290,18 @@ module.exports = (nextApp, {
         req.providers = () => {
             return new Promise((resolve, reject) => {
                 let configuredProviders = {}
-                providers.forEach(provider => {
+                const configPromises = providers.map(provider => {
                     configuredProviders[provider.providerName] = {
                         signin: (serverUrl || '') + `${pathPrefix}/oauth/${provider.providerName.toLowerCase()}`,
                         callback: (serverUrl || '') + `${pathPrefix}/oauth/${provider.providerName.toLowerCase()}/callback`
                     }
-                })
-                return resolve(configuredProviders)
+
+                    return Promise.resolve(provider.onConfig && provider.onConfig(req));
+                });
+
+                return Promise
+                    .all(configPromises)
+                    .then(() => resolve(configuredProviders));
             })
         }
         next()
