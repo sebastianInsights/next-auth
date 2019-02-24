@@ -299,7 +299,7 @@ module.exports = (nextApp, {
                     return Promise.resolve(provider.onConfig && provider.onConfig(req));
                 });
 
-                return Promise
+                Promise
                     .all(configPromises)
                     .then(() => resolve(configuredProviders));
             })
