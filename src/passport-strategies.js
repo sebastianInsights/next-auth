@@ -304,7 +304,7 @@ module.exports = ({
           debugger;
           passport.authenticate(providerName, {
             ...providerOptions,
-            state: btoa(JSON.stringify({ returnTo: `https://${req.headers.host}` })),
+            state: Buffer.from(JSON.stringify({ returnTo: `https://${req.headers.host}` })).toString('base64'),
           })(req, res, next);
         },
     );
