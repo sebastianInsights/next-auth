@@ -304,7 +304,10 @@ module.exports = ({
           passport.authenticate(providerName, {
             ...providerOptions,
             state: Buffer.from(
-                JSON.stringify({ originalHost: req.headers.host, returnTo: req.query.returnTo  }),
+                JSON.stringify({
+                  originalHost: req.headers.host,
+                  returnTo: req.query.returnTo,
+                }),
             ).toString("base64"),
           })(req, res, next);
         },
@@ -319,19 +322,31 @@ module.exports = ({
               const parsedState = JSON.parse(
                   Buffer.from(req.query.state, "base64").toString(),
               );
-              if(parsedState.originalHost && parsedState.originalHost !== req.headers.host){
-                res.redirect(`https://${parsedState.originalHost}${req.originalUrl}`);
+              if (
+                  parsedState.originalHost &&
+                  parsedState.originalHost !== req.headers.host
+              ) {
+                res.redirect(
+                    `https://${parsedState.originalHost}${req.originalUrl}`,
+                );
                 return;
               }
             } catch (b64err) {
               debugger;
             }
-          }
 
-          passport.authenticate(providerName, {
-            successRedirect: `${pathPrefix}/callback?action=signin&service=${providerName}&returnTo=${parsedState.returnTo || ''}`,
-            failureRedirect: `${pathPrefix}/error?action=signin&type=oauth&service=${providerName}&returnTo=${parsedState.returnTo || ''}`,
-          })(req, res, next);
+            passport.authenticate(providerName, {
+              successRedirect: `${pathPrefix}/callback?action=signin&service=${providerName}&returnTo=${parsedState.returnTo ||
+              ""}`,
+              failureRedirect: `${pathPrefix}/error?action=signin&type=oauth&service=${providerName}&returnTo=${parsedState.returnTo ||
+              ""}`,
+            })(req, res, next);
+          } else {
+            passport.authenticate(providerName, {
+              successRedirect: `${pathPrefix}/callback?action=signin&service=${providerName}`,
+              failureRedirect: `${pathPrefix}/error?action=signin&type=oauth&service=${providerName}`,
+            })(req, res, next);
+          }
         },
     );
 
