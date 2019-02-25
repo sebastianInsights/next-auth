@@ -331,16 +331,16 @@ module.exports = ({
             } catch (b64err) {
               debugger;
             }
-          } else {
-            let successRedirect = `${pathPrefix}/callback?action=signin&service=${providerName}&returnTo=${parsedState.returnTo || ""}`;
-            let failureRedirect = `${pathPrefix}/error?action=signin&type=oauth&service=${providerName}&returnTo=${parsedState.returnTo || ""}`;
-            if(parsedState && parsedState.returnTo){
-              successRedirect = `${successRedirect}&returnTo=${parsedState.returnTo}`;
-              failureRedirect = `${failureRedirect}&returnTo=${parsedState.returnTo}`;
-            }
-
-            passport.authenticate(providerName, { successRedirect, failureRedirect })(req, res, next);
           }
+
+          let successRedirect = `${pathPrefix}/callback?action=signin&service=${providerName}&returnTo=${parsedState.returnTo || ""}`;
+          let failureRedirect = `${pathPrefix}/error?action=signin&type=oauth&service=${providerName}&returnTo=${parsedState.returnTo || ""}`;
+          if(parsedState && parsedState.returnTo){
+            successRedirect = `${successRedirect}&returnTo=${parsedState.returnTo}`;
+            failureRedirect = `${failureRedirect}&returnTo=${parsedState.returnTo}`;
+          }
+
+          passport.authenticate(providerName, { successRedirect, failureRedirect })(req, res, next);
         },
     );
 
