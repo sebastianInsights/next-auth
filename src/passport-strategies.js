@@ -317,15 +317,12 @@ module.exports = ({
     expressApp.get(
         `${pathPrefix}/oauth/${providerName.toLowerCase()}/callback`,
         (req, res, next) => {
+          let parsedState = null;
+
           if (req.query.state) {
             try {
-              const parsedState = JSON.parse(
-                  Buffer.from(req.query.state, "base64").toString(),
-              );
-              if (
-                  parsedState.originalHost &&
-                  parsedState.originalHost !== req.headers.host
-              ) {
+              parsedState = JSON.parse(Buffer.from(req.query.state, "base64").toString());
+              if (parsedState.originalHost && parsedState.originalHost !== req.headers.host) {
                 res.redirect(
                     `https://${parsedState.originalHost}${req.originalUrl}`,
                 );
@@ -334,18 +331,15 @@ module.exports = ({
             } catch (b64err) {
               debugger;
             }
-
-            passport.authenticate(providerName, {
-              successRedirect: `${pathPrefix}/callback?action=signin&service=${providerName}&returnTo=${parsedState.returnTo ||
-              ""}`,
-              failureRedirect: `${pathPrefix}/error?action=signin&type=oauth&service=${providerName}&returnTo=${parsedState.returnTo ||
-              ""}`,
-            })(req, res, next);
           } else {
-            passport.authenticate(providerName, {
-              successRedirect: `${pathPrefix}/callback?action=signin&service=${providerName}`,
-              failureRedirect: `${pathPrefix}/error?action=signin&type=oauth&service=${providerName}`,
-            })(req, res, next);
+            let successRedirect = `${pathPrefix}/callback?action=signin&service=${providerName}&returnTo=${parsedState.returnTo || ""}`;
+            let failureRedirect = `${pathPrefix}/error?action=signin&type=oauth&service=${providerName}&returnTo=${parsedState.returnTo || ""}`;
+            if(parsedState && parsedState.returnTo){
+              successRedirect = `${successRedirect}&returnTo=${parsedState.returnTo}`;
+              failureRedirect = `${failureRedirect}&returnTo=${parsedState.returnTo}`;
+            }
+
+            passport.authenticate(providerName, { successRedirect, failureRedirect })(req, res, next);
           }
         },
     );
