@@ -333,8 +333,8 @@ module.exports = ({
             }
           }
 
-          let successRedirect = `${pathPrefix}/callback?action=signin&service=${providerName}&returnTo=${parsedState.returnTo || ""}`;
-          let failureRedirect = `${pathPrefix}/error?action=signin&type=oauth&service=${providerName}&returnTo=${parsedState.returnTo || ""}`;
+          let successRedirect = `${pathPrefix}/callback?action=signin&service=${providerName}`;
+          let failureRedirect = `${pathPrefix}/error?action=signin&type=oauth&service=${providerName}`;
           if(parsedState && parsedState.returnTo){
             successRedirect = `${successRedirect}&returnTo=${parsedState.returnTo}`;
             failureRedirect = `${failureRedirect}&returnTo=${parsedState.returnTo}`;
