@@ -134,7 +134,7 @@ module.exports = ({
           if (req.user) {
             // This section handles scenarios when a user is already signed in.
 
-            if (user) {
+            if (user && req.user.id === user.id) {
               // This section handles if the user is already logged in
               if (req.user.id === user.id) {
                 // This section handles if the user is already logged in and is
