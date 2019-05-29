@@ -417,6 +417,7 @@ module.exports = (nextApp, {
          * Verify token in callback URL for email sign in
          */
         expressApp.get(`${pathPrefix}/email/signin/:token`, (req, res) => {
+            const returnToPath = req.query.returnTo;
             if (!req.params.token) {
                 return res.redirect(`${pathPrefix}/error?action=signin&type=token-missing`)
             }
@@ -442,6 +443,9 @@ module.exports = (nextApp, {
                             return res.json({success: true})
                         } else {
                             // If normal form POST (from client without JS) return redirect
+                            if(returnToPath){
+                                return res.redirect(`${pathPrefix}/callback?action=signin&service=email&returnTo=${encodeURIComponent(returnToPath)}`)
+                            }
                             return res.redirect(`${pathPrefix}/callback?action=signin&service=email`)
                         }
                     })
