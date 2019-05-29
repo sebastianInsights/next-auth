@@ -461,8 +461,11 @@ module.exports = (nextApp, {
      */
     expressApp.post(`${pathPrefix}/signout`, (req, res) => {
         // Log user out with Passport and remove their Express session
+        const returnToPath = req.query.returnTo;
         req.logout()
         req.session.destroy(() => {
+            if(returnToPath)
+                return res.redirect(`${pathPrefix}/callback?action=signout&returnTo=${encodeURIComponent(returnToPath)}`)
             return res.redirect(`${pathPrefix}/callback?action=signout`)
         })
     })
