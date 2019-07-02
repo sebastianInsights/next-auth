@@ -196,9 +196,10 @@ module.exports = (nextApp, {
     * call recaptcha check
     */
 
-    expressApp.post(`${pathPrefix}/*`, (req, res, next) => {
+    expressApp.post(`${pathPrefix}/*`, async (req, res, next) => {
        if(onReCaptcha){
-           if(onReCaptcha(req,res,next)){
+           const result = await onReCaptcha(req,res,next);
+           if(result){
              next();
              return;
            }
