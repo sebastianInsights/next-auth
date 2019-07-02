@@ -123,7 +123,8 @@ module.exports = (nextApp, {
       password = null
     } = {}) => { Promise.resolve(user) }
     */
-    }
+    },
+    onReCaptcha = null
 } = {}) => {
 
     if (typeof (functions) !== 'object') {
@@ -190,6 +191,21 @@ module.exports = (nextApp, {
         providers: providers,
         functions: functions
     })
+
+    /*
+    * call recaptcha check
+    */
+
+    expressApp.post(`${pathPrefix}/*`, (req, res, next) => {
+       if(onReCaptcha){
+           if(onReCaptcha(req,res,next)){
+             next();
+             return;
+           }
+       }
+
+        res.status(401).send(JSON.stringify({error: "recaptcha_token"}));
+    });
 
     /*
      * Add route to get CSRF token via AJAX
