@@ -374,8 +374,8 @@ module.exports = (nextApp, {
                     }
                 })
                 .catch(err => {
-                    if(req.xhr){
-                        return Promise.reject(err);
+                    if(req.xhr && err.status !== undefined && err.status>=400){
+                        return res.status(err.status).json({status:err.status, message: err.message});
                     }
                     return res.redirect(`${pathPrefix}/error?action=signin&type=credentials`)
                 })
