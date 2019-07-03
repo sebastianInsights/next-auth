@@ -124,7 +124,8 @@ module.exports = (nextApp, {
     } = {}) => { Promise.resolve(user) }
     */
     },
-    onReCaptcha = null
+    onReCaptcha = null,
+    onBeforeSetupRoutes = null
 } = {}) => {
 
     if (typeof (functions) !== 'object') {
@@ -133,6 +134,10 @@ module.exports = (nextApp, {
 
     if (expressApp === null) {
         expressApp = Express()
+    }
+
+    if(onBeforeSetupRoutes){
+        onBeforeSetupRoutes(expressApp);
     }
 
     // If an instance of nextApp was passed, let all requests to /_next/* pass
