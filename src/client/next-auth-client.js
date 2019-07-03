@@ -4,11 +4,11 @@ import fetch from 'isomorphic-fetch'
 
 export default class {
   /**
-   * This is an async, isometric method which returns a session object - 
+   * This is an async, isometric method which returns a session object -
    * either by looking up the current express session object when run on the
    * server, or by using fetch (and optionally caching the result in local
-   * storage) when run on the client.  
-   * 
+   * storage) when run on the client.
+   *
    * Note that actual session tokens are not stored in local storage, they are
    * kept in an HTTP Only cookie as protection against session hi-jacking by
    * malicious JavaScript.
@@ -110,7 +110,7 @@ export default class {
   } = {}) {
     // If running server side, uses server side method
     if (req) return req.linked()
-    
+
     // If running client side, use RESTful endpoint
     return fetch('/auth/linked', {
       credentials: 'same-origin'
@@ -126,7 +126,7 @@ export default class {
     .then(data => data)
     .catch(() => Error('Unable to get linked accounts'))
   }
-  
+
   /**
    * A static method to get list of currently configured oAuth providers
    **/
@@ -135,7 +135,7 @@ export default class {
   } = {}) {
     // If running server side, uses server side method
     if (req) return req.providers()
-    
+
     // If running client side, use RESTful endpoint
     return fetch('/auth/providers', {
       credentials: 'same-origin'
@@ -160,7 +160,7 @@ export default class {
 
   /*
    * Sign in
-   * 
+   *
    * Will post a form to /auth/signin auth route if an object is passed.
    * If the details are valid a session will be created and you should redirect
    * to your callback page so the session is loaded in the client.
@@ -174,11 +174,11 @@ export default class {
     const formData = (typeof params === 'string') ? { email: params } : params
 
     // Use either the email token generation route or the custom form auth route
-    const route = (typeof params === 'string') ? '/auth/email/signin' : '/auth/signin' 
+    const route = (typeof params === 'string') ? '/auth/email/signin' : '/auth/signin'
 
     // Add latest CSRF Token to request
     formData._csrf = await this.csrfToken()
-    
+
     // Encoded form parser for sending data in the body
     const encodedForm = Object.keys(formData).map((key) => {
       return encodeURIComponent(key) + '=' + encodeURIComponent(formData[key])
@@ -197,14 +197,15 @@ export default class {
       if (response.ok) {
         return await response.json()
       } else {
-        throw new Error('HTTP error while attempting to sign in')
+        //throw new Error('HTTP error while attempting to sign in')
+        throw await response.json();
       }
     })
     .then(data => {
       if (data.success && data.success === true) {
         return Promise.resolve(true)
       } else {
-        return Promise.resolve(false)
+        return Promise.reject(false)
       }
     })
   }
@@ -218,7 +219,7 @@ export default class {
     const encodedForm = Object.keys(formData).map((key) => {
       return encodeURIComponent(key) + '=' + encodeURIComponent(formData[key])
     }).join('&')
-    
+
     // Remove cached session data
     this._removeLocalStore('session')
 
@@ -246,7 +247,7 @@ export default class {
       return null
     }
   }
-  
+
   static _saveLocalStore(name, data) {
     try {
       localStorage.setItem(name, JSON.stringify(data))
@@ -255,7 +256,7 @@ export default class {
       return false
     }
   }
-  
+
   static _removeLocalStore(name) {
     try {
       localStorage.removeItem(name)
