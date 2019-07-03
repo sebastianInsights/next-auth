@@ -422,11 +422,11 @@ module.exports = (nextApp, {
                         return res.json({success: true})
                     } else {
                         // If normal form POST (from client without JS) return redirect
-                        return res.redirect(`${pathPrefix}/check-email?email=${email}`)
+                        return res.redirect(`${pathPrefix}/check-email`)
                     }
                 })
                 .catch(err => {
-                    return res.redirect(`${pathPrefix}/error?action=signin&type=email&email=${email}`)
+                    return res.redirect(`${pathPrefix}/error?action=signin&type=email`)
                 })
         })
 
