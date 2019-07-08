@@ -1,8 +1,8 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('babel-polyfill'), require('isomorphic-fetch')) :
-  typeof define === 'function' && define.amd ? define(['exports', 'babel-polyfill', 'isomorphic-fetch'], factory) :
-  (factory((global['next-auth-client'] = {}),null,global.fetch));
-}(this, (function (exports,babelPolyfill,fetch) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('isomorphic-fetch')) :
+  typeof define === 'function' && define.amd ? define(['exports', 'isomorphic-fetch'], factory) :
+  (factory((global['next-auth-client'] = {}),global.fetch));
+}(this, (function (exports,fetch) { 'use strict';
 
   fetch = fetch && fetch.hasOwnProperty('default') ? fetch['default'] : fetch;
 
@@ -21,11 +21,11 @@
       key: 'init',
 
       /**
-       * This is an async, isometric method which returns a session object - 
+       * This is an async, isometric method which returns a session object -
        * either by looking up the current express session object when run on the
        * server, or by using fetch (and optionally caching the result in local
-       * storage) when run on the client.  
-       * 
+       * storage) when run on the client.
+       *
        * Note that actual session tokens are not stored in local storage, they are
        * kept in an HTTP Only cookie as protection against session hi-jacking by
        * malicious JavaScript.
@@ -289,7 +289,7 @@
 
       /*
        * Sign in
-       * 
+       *
        * Will post a form to /auth/signin auth route if an object is passed.
        * If the details are valid a session will be created and you should redirect
        * to your callback page so the session is loaded in the client.
@@ -356,9 +356,13 @@
                               return _context5.abrupt('return', _context5.sent);
 
                             case 6:
-                              throw new Error('HTTP error while attempting to sign in');
+                              _context5.next = 8;
+                              return response.json();
 
-                            case 7:
+                            case 8:
+                              throw _context5.sent;
+
+                            case 9:
                             case 'end':
                               return _context5.stop();
                           }
@@ -373,7 +377,7 @@
                     if (data.success && data.success === true) {
                       return Promise.resolve(true);
                     } else {
-                      return Promise.resolve(false);
+                      return Promise.reject(false);
                     }
                   }));
 
