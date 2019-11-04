@@ -323,7 +323,7 @@ module.exports = (nextApp, {
                         callback: (serverUrl || callbackUrl || '') + `${pathPrefix}/oauth/${provider.providerName.toLowerCase()}/callback`
                     }
 
-                    return Promise.resolve(provider.onConfig && provider.onConfig(req));
+                    return Promise.resolve(provider.onConfig && provider.onConfig(req, configuredProviders[provider.providerName]));
                 });
 
                 Promise
@@ -343,7 +343,7 @@ module.exports = (nextApp, {
                     callback: (serverUrl || callbackUrl || '') + `${pathPrefix}/oauth/${provider.providerName.toLowerCase()}/callback`
                 }
 
-                return Promise.resolve(provider.onConfig && provider.onConfig(req));
+                return Promise.resolve(provider.onConfig && provider.onConfig(req, configuredProviders[provider.providerName]));
             });
 
             return Promise.all(configPromises).then(res.json(configuredProviders));
