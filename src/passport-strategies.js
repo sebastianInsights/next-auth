@@ -78,9 +78,9 @@ module.exports = ({
         if (strategyOptions.callbackURL && hasReturnURL) {
             strategyOptions.returnURL = strategyOptions.callbackURL;
         }
-        strategyOptions.passReqToCallback = true
+        strategyOptions.passReqToCallback = true;
 
-        passport.use(providerName, new Strategy(strategyOptions, (req, accessToken, refreshToken, _params, _profile, next) => {
+        const strategyRouteFn = (req, accessToken, refreshToken, _params, _profile, next) => {
 
             try {
                 // Normalise the provider specific profile into a standard basic
@@ -295,8 +295,19 @@ module.exports = ({
                 return next(err, false)
             }
 
-        }))
-    })
+        };
+
+        if (typeof strategyOptions === 'function') {
+            passport.use(providerName, async (req, res, next) => {
+                debugger;
+                const options = await strategyOptions(req);
+                const strategyInstance = new Strategy(options, strategyRouteFn);
+                return strategyInstance(req, res, next);
+            });
+        } else {
+            passport.use(providerName, new Strategy(strategyOptions, strategyRouteFn));
+        }
+    });
 
     // Initialise Passport
     expressApp.use(passport.initialize())
