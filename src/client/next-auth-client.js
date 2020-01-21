@@ -172,12 +172,14 @@ export default class {
     static async signin(rawParams) {
         // Params can be just string (an email address) or an object (form fields)
         let reCaptchaToken = null;
+        let processID = null;
         let isParamsString = typeof rawParams === 'string';
         let params = isParamsString ? rawParams : {};
         if (!isParamsString) {
             reCaptchaToken = rawParams.reCaptchaToken;
+            processID = rawParams.processID;
             let rest = {};
-            Object.keys(rawParams).filter(k => k !== 'reCaptchaToken').forEach(k => {
+            Object.keys(rawParams).filter(k => k !== 'reCaptchaToken' && k !== 'processID').forEach(k => {
                 rest[k] = rawParams[k]
             });
             params = rest;
@@ -194,6 +196,7 @@ export default class {
         // Add latest CSRF Token to request
         formData._csrf = await this.csrfToken()
         formData.reCaptchaToken = reCaptchaToken;
+        formData.processID = processID;
 
         // Encoded form parser for sending data in the body
         const encodedForm = Object.keys(formData).map((key) => {
