@@ -138,7 +138,7 @@ module.exports = ({
                     provider: {
                         name: providerName.toLowerCase(),
                         id: profile.id,
-                        email: providerName.email
+                        email: profile.email
                     }
                 }, req)
                     .then(user => {
