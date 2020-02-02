@@ -137,7 +137,8 @@ module.exports = ({
                 functions.find({
                     provider: {
                         name: providerName.toLowerCase(),
-                        id: profile.id
+                        id: profile.id,
+                        email: providerName.email
                     }
                 }, req)
                     .then(user => {
